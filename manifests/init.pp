@@ -44,7 +44,8 @@ class xrdp (
     case $::osfamily {
       'RedHat': {
         package { 'nux-dextop-release':
-          source =>  $repo_release_rpm
+          provider => 'rpm',
+          source   => $repo_release_rpm
         }
       }
       default: {
@@ -55,6 +56,7 @@ class xrdp (
   }
 
   package { 'xrdp':
+    require => Package['nux-dextop-release']
   }
 
 }
