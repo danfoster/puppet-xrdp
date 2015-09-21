@@ -36,9 +36,10 @@
 # Copyright 2015 Your name here, unless otherwise noted.
 #
 class xrdp (
-  $manage_repo = true,
-  $repo_release_rpm = 'http://li.nux.ro/download/nux/dextop/el7/x86_64/nux-dextop-release-0-5.el7.nux.noarch.rpm'
-) {
+  $manage_repo      = $::xrdp::params::manage_repo,
+  $manage_firewall  = $::xrdp::params::manage_firewall,
+  $repo_release_rpm = $::xrdp::params::repo_release_rpm
+) inherits ::xrdp::params {
 
   if ($manage_repo) {
     case $::osfamily {
@@ -56,7 +57,26 @@ class xrdp (
   }
 
   package { 'xrdp':
+    ensure  => present,
     require => Package['nux-dextop-release']
+  }
+
+  service { 'xrdp':
+    ensure  => running,
+    require => Package['xrdp']
+  }
+
+  service { 'xrdp-sesman':
+    ensure  => running,
+    require => Package['xrdp'],
+  }
+
+  if ($manage_firewall) {
+    firewall { '050 Accept RDP':
+      proto  => 'tcp',
+      port   => 3389,
+      action => 'accept'
+    }
   }
 
 }
