@@ -71,4 +71,9 @@ class xrdp (
     }
   }
 
+  # UK keyboard mapping
+  file { '/etc/xrdp/km-0809.ini':
+    ensure => present,
+    source => 'puppet:///modules/xrdp/km-0809.ini'
+  }
 }
