@@ -1,39 +1,31 @@
 # == Class: xrdp
 #
-# Full description of class xrdp here.
+# This module deploys a RDP Server using xrdp, xrdp-sesman and Xvnc.
 #
 # === Parameters
 #
-# Document parameters here.
+# [*manage_repo*]
+#   Add a repo that provides the xrdp package by installing the release rpm as
+#   specified in $repo_release_rpm. Default: true
 #
-# [*sample_parameter*]
-#   Explanation of what this parameter affects and what it defaults to.
-#   e.g. "Specify one or more upstream ntp servers as an array."
+# [*manage_firewall*]
+#   Open firewall holes. Requires the puppetlabs/firewall module. Default: true
 #
-# === Variables
-#
-# Here you should define a list of variables that this module would require.
-#
-# [*sample_variable*]
-#   Explanation of how this variable affects the funtion of this class and if
-#   it has a default. e.g. "The parameter enc_ntp_servers must be set by the
-#   External Node Classifier as a comma separated list of hostnames." (Note,
-#   global variables should be avoided in favor of class parameters as
-#   of Puppet 2.6.)
+# [*repo_release_rpm*]
+#   The release RPM to use if manage_repo is true. 
 #
 # === Examples
 #
 #  class { 'xrdp':
-#    servers => [ 'pool.ntp.org', 'ntp.local.company.com' ],
 #  }
 #
 # === Authors
 #
-# Author Name <author@domain.com>
+# Dan Foster <dan@zem.org.uk>
 #
 # === Copyright
 #
-# Copyright 2015 Your name here, unless otherwise noted.
+# Copyright 2015 Dan Foster, unless otherwise noted.
 #
 class xrdp (
   $manage_repo      = $::xrdp::params::manage_repo,
@@ -46,7 +38,8 @@ class xrdp (
       'RedHat': {
         package { 'nux-dextop-release':
           provider => 'rpm',
-          source   => $repo_release_rpm
+          source   => $repo_release_rpm,
+          before   => Package['xrdp']
         }
       }
       default: {
@@ -58,7 +51,6 @@ class xrdp (
 
   package { 'xrdp':
     ensure  => present,
-    require => Package['nux-dextop-release']
   }
 
   service { 'xrdp':
